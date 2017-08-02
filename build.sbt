@@ -53,15 +53,13 @@ libraryDependencies ++= Seq(
   "org.lwjgl" % "lwjgl-glfw" % lwjglVersion,
   "org.lwjgl" % "lwjgl-jemalloc" % lwjglVersion,
   "org.lwjgl" % "lwjgl-openal" % lwjglVersion,
+  "org.lwjgl" % "lwjgl-opengl" % lwjglVersion,
   "org.lwjgl" % "lwjgl-stb" % lwjglVersion,
   "org.lwjgl" % "lwjgl-vulkan" % lwjglVersion,
   "org.lwjgl" % "lwjgl" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos",
   "org.lwjgl" % "lwjgl-glfw" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos",
   "org.lwjgl" % "lwjgl-jemalloc" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos",
   "org.lwjgl" % "lwjgl-openal" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos",
+  "org.lwjgl" % "lwjgl-opengl" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos",
   "org.lwjgl" % "lwjgl-stb" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos"
 )
-
-//libraryDependencies +=
-//  "org.lwjgl" % "lwjgl" % "3.1.2" % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos" //classifier "natives-osx"
-

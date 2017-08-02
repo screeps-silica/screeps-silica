@@ -1,14 +1,16 @@
 import util._
-
 import org.lwjgl
 import org.lwjgl.glfw._
 import org.lwjgl.glfw.GLFW._
+import org.lwjgl.opengl.GL
 import scalaz.Scalaz._
 
-case class GLFWWindowRef(handle: Long) extends AnyVal {
+import scala.language.implicitConversions
+
+case class GLFWWindowRef(private val handle: Long) {
   final def title_=(title: String): Unit = glfwSetWindowTitle(handle, title)
-  final def shouldClose_=(shouldClose: Boolean): Unit = glfwSetWindowShouldClose(handle, shouldClose)
-  final def keyCallback_=(glfwKeyCallback: GLFWKeyCallback): Unit = glfwSetKeyCallback(handle, glfwKeyCallback)
+  def shouldClose_=(shouldClose: Boolean): Unit = glfwSetWindowShouldClose(handle, shouldClose)
+  def keyCallback_=(glfwKeyCallback: GLFWKeyCallback): Unit = glfwSetKeyCallback(handle, glfwKeyCallback)
 }
 
 object GLFWWindowRef {
@@ -18,8 +20,10 @@ object GLFWWindowRef {
   }
 
   implicit class GLWindowRefImplicits(winRef: GLFWWindowRef) extends AnyRef {
-    def convertToHandle(): Long = winRef.handle
+    def asHandle: Long = winRef.handle
   }
+
+  implicit def asHandle(glfwWindowRef: GLFWWindowRef): Long = glfwWindowRef.handle
 }
 
 class GLWindower() {
@@ -51,7 +55,22 @@ class GLWindower() {
   }
 
   window.keyCallback_=(this.keyCallback)
+  
 
+  glfwMakeContextCurrent(window)
+  GL.createCapabilities()
+
+  def runLoop(): Unit = {
+    while (!glfwWindowShouldClose(window)) {
+      val time = glfwGetTime()
+      glfwSwapBuffers(window)
+      glfwPollEvents()
+    }
+    glfwDestroyWindow(window)
+    keyCallback.free()
+    glfwTerminate()
+    errorCallback.free()
+  }
 }
 
 object GLWindower {

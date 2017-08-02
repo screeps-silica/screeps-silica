@@ -6,7 +6,7 @@ object Application {
     println(s"LWJGL Version: ${org.lwjgl.Version.getVersion}")
 
     val window = GLWindower()
-
+    window.runLoop()
 
   }
 }
