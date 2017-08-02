@@ -1,10 +1,13 @@
+import java.util.Date
+
 import util._
 import org.lwjgl
 import org.lwjgl.glfw._
 import org.lwjgl.glfw.GLFW._
 import org.lwjgl.opengl.GL
-import scalaz.Scalaz._
 
+import scalaz.Scalaz._
+import scala.concurrent.duration._
 import scala.language.implicitConversions
 
 case class GLFWWindowRef(private val handle: Long) {
@@ -55,16 +58,26 @@ class GLWindower() {
   }
 
   window.keyCallback_=(this.keyCallback)
-  
+
 
   glfwMakeContextCurrent(window)
   GL.createCapabilities()
 
+  private def processInput(time: Double): Unit = {
+    glfwPollEvents()
+  }
+
+  private def render(time: Double): Unit = {
+    glfwSwapBuffers(window)
+  }
+
   def runLoop(): Unit = {
+    val sleepMillis = 16.6.milliseconds.toMillis
     while (!glfwWindowShouldClose(window)) {
       val time = glfwGetTime()
-      glfwSwapBuffers(window)
-      glfwPollEvents()
+      processInput(time)
+      render(time)
+      Thread.sleep(sleepMillis)
     }
     glfwDestroyWindow(window)
     keyCallback.free()
