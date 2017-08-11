@@ -13,6 +13,14 @@ import opengl.GL30._
 import scalaz.Scalaz._
 import scala.concurrent.duration._
 import scala.language.implicitConversions
+import Disposable.With
+
+case class GLVertexArray(handle: Int) extends AnyVal
+object GLVertexArray {
+  implicit object GLVertexArrayIsDisposable extends Disposable[GLVertexArray] {
+    override def dispose(vertArray: GLVertexArray): Unit = glDeleteVertexArrays(vertArray.handle)
+  }
+}
 
 case class GLFWWindowRef(private val handle: Long) {
   final def title_=(title: String): Unit = glfwSetWindowTitle(handle, title)
@@ -77,28 +85,45 @@ class GLWindower() {
 
   private def render(time: Double, deltaTime: Double): Unit = {
     glfwSwapBuffers(window)
-    val vao = glGenVertexArrays()
-    glBindVertexArray(vao)
-    glDeleteVertexArrays(vao)
+    With(GLVertexArray(glGenVertexArrays()))(vao => glBindVertexArray(vao.handle))
+  }
+
+  private implicit object GLFWWindowRefIsDisposable extends Disposable[GLFWWindowRef] {
+    override def dispose(window: GLFWWindowRef): Unit = glfwDestroyWindow(window)
+  }
+
+  private implicit object KeyCallbackIsDisposable extends Disposable[GLFWKeyCallback] {
+    override def dispose(callback: GLFWKeyCallback): Unit = callback.free()
+  }
+
+  private implicit object ErrorCallbackIsDisposable extends Disposable[GLFWErrorCallback] {
+    override def dispose(callback: GLFWErrorCallback): Unit = callback.free()
   }
 
   def runLoop(): Unit = {
     val sleepMillis = 16.6.milliseconds.toMillis
     var lastTime = -1.0d
-    while (!glfwWindowShouldClose(window)) {
-      val time = glfwGetTime()
-      val deltaTime = if (lastTime > 0) { time - lastTime } else { 0 }
+    With(errorCallback)(_ => {
+      With(keyCallback)(_ => {
+        With(window)(window => {
+          while (!glfwWindowShouldClose(window)) {
+            val time = glfwGetTime()
+            val deltaTime = if (lastTime > 0) {
+              time - lastTime
+            } else {
+              0
+            }
 
-      processInput(time, deltaTime)
-      render(time, deltaTime)
+            processInput(time, deltaTime)
+            render(time, deltaTime)
 
-      lastTime = time
-      Thread.sleep(sleepMillis)
-    }
-    glfwDestroyWindow(window)
-    keyCallback.free()
-    glfwTerminate()
-    errorCallback.free()
+            lastTime = time
+            Thread.sleep(sleepMillis)
+          }
+        })
+      })
+      glfwTerminate()
+    })
   }
 }
 

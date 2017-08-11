@@ -12,12 +12,13 @@ lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
     "org.scalacheck" %% "scalacheck" % "1.13.5"
   ),
 
-  //libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.2",
+  libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.2",
 
   libraryDependencies ++= Seq(
     "io.argonaut" %% "argonaut" % argonautVersion,
     "io.argonaut" %% "argonaut-scalaz" % argonautVersion,
-    "io.argonaut" %% "argonaut-monocle" % argonautVersion
+    "io.argonaut" %% "argonaut-monocle" % argonautVersion,
+    "com.github.alexarchambault" %% "argonaut-shapeless_6.2" % "1.2.0-M6"
   ),
 
   libraryDependencies ++= Seq(
@@ -36,6 +37,10 @@ lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
   libraryDependencies += "org.scala-graph" %% "graph-constrained" % "1.11.0",
   libraryDependencies += "io.reactivex" %% "rxscala" % "0.26.5",
 
+  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
+)
+
+lazy val lwjglSettings: Seq[Def.Setting[_]] = Seq(
   libraryDependencies ++= Seq(
     "org.lwjgl" % "lwjgl" % lwjglVersion,
     "org.lwjgl" % "lwjgl-glfw" % lwjglVersion,
@@ -50,11 +55,8 @@ lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
     "org.lwjgl" % "lwjgl-openal" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos",
     "org.lwjgl" % "lwjgl-opengl" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos",
     "org.lwjgl" % "lwjgl-stb" % lwjglVersion % "runtime" classifier "natives-windows" classifier "natives-linux" classifier "natives-macos"
-  ),
-
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
+  )
 )
-
 
 lazy val root = (project in file("."))
   .aggregate(networking)
@@ -78,9 +80,7 @@ lazy val root = (project in file("."))
     name := "Silica"
   )
   .settings(sharedSettings: _*)
-
-
-
+  .settings(lwjglSettings: _*)
 
 lazy val networking = (project in file("./Networking"))
   .settings(
