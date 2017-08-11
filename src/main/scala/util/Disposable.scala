@@ -2,16 +2,16 @@ package util
 
 import scala.annotation.implicitNotFound
 import scala.util.{Failure, Success, Try}
+import java.io.Closeable
 
 
-trait Disposable[T] {
+trait Disposable[T] extends Any {
   def dispose(resource: T): Unit
 }
 
-
 object Disposable {
 
-  def disposableFor[T](t: T)(implicit disposable: Disposable[T]): Disposable[T] = disposable
+  final def disposableFor[T](t: => T)(implicit disposable: Disposable[T]): Disposable[T] = disposable
 
   implicit object UnitIsDisposable extends Disposable[Unit] {
     def dispose(resource: Unit): Unit = {}
@@ -21,31 +21,22 @@ object Disposable {
     def dispose(resource: None.type): Unit = {}
   }
 
-  implicit def SomeIsDisposable[T : Disposable]: Disposable[Some[T]] = {
+  final implicit def SomeIsDisposable[T: Disposable]: Disposable[Some[T]] =
     (resource: Some[T]) => implicitly[Disposable[T]].dispose(resource.get)
-  }
 
-  implicit def OptionIsDisposable[T : Disposable]: Disposable[Option[T]] = {
-    (resource: Option[T]) => {
-      resource match {
-        case Some(value) => implicitly[Disposable[T]].dispose(value)
-        case _ => None
-      }
-    }
-  }
+  final implicit def OptionIsDisposable[T: Disposable]: Disposable[Option[T]] =
+    (resource: Option[T]) => resource.foreach(value => implicitly[Disposable[T]].dispose(value))
 
-  import java.lang.AutoCloseable
   implicit object AutoCloseableIsDisposable extends Disposable[AutoCloseable] {
     override def dispose(resource: AutoCloseable): Unit = resource.close()
   }
 
-  import java.io.Closeable
   implicit object CloseableIsDisposable extends Disposable[Closeable] {
     override def dispose(resource: Closeable): Unit = resource.close()
   }
 
   @implicitNotFound("Resource does not belong to typeclass Disposable")
-  final def With[TRes : Disposable, B](resource: TRes)(doWork: TRes => B): Try[B] = {
+  final def With[TRes: Disposable, B](resource: TRes)(doWork: TRes => B): Try[B] = {
     try {
       Success(doWork(resource))
     } catch {
@@ -54,5 +45,24 @@ object Disposable {
       implicitly[Disposable[TRes]].dispose(resource)
     }
   }
+
+  final def Func[T](callback: => Any)(block: => T): Try[T] = {
+    try {
+      Success(block)
+    } catch {
+      case e: Exception => Failure(e)
+    } finally {
+      callback
+    }
+  }
+
+  class LambdaDisposable[T](val item: T, val disposer: T => Any) {
+    final def dispose(): Unit = disposer(item)
+  }
+
+  final implicit def lambdaDisposableIsDisposable[T]: Disposable[LambdaDisposable[T]] =
+    (resource: LambdaDisposable[T]) => resource.dispose()
+
+  final def Create[T](resource: T)(disposer: T => Any): LambdaDisposable[T] = new LambdaDisposable(resource, disposer)
 
 }

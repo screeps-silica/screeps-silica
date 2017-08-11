@@ -13,7 +13,9 @@ import opengl.GL30._
 import scalaz.Scalaz._
 import scala.concurrent.duration._
 import scala.language.implicitConversions
-import Disposable.With
+import Disposable.{Func, With}
+
+import scala.annotation.tailrec
 
 case class GLVertexArray(handle: Int) extends AnyVal
 object GLVertexArray {
@@ -46,7 +48,7 @@ class GLWindower() {
   private val errorCallback: GLFWErrorCallback = GLFWErrorCallback.createThrow
   glfwSetErrorCallback(errorCallback)
 
-  if(!glfwInit()) {
+  if (!glfwInit()) {
     throw new IllegalStateException("Unable to initialize GLFW")
   }
 
@@ -102,28 +104,26 @@ class GLWindower() {
 
   def runLoop(): Unit = {
     val sleepMillis = 16.6.milliseconds.toMillis
-    var lastTime = -1.0d
-    With(errorCallback)(_ => {
-      With(keyCallback)(_ => {
-        With(window)(window => {
-          while (!glfwWindowShouldClose(window)) {
-            val time = glfwGetTime()
-            val deltaTime = if (lastTime > 0) {
-              time - lastTime
-            } else {
-              0
-            }
 
-            processInput(time, deltaTime)
-            render(time, deltaTime)
+    @tailrec
+    def loop(lastTime: Double, sleepMillis: Long): Unit = {
+      if (!glfwWindowShouldClose(window)) {
+        val time = glfwGetTime()
+        val deltaTime = time - lastTime
+        processInput(time, deltaTime)
+        render(time, deltaTime)
+        Thread.sleep(sleepMillis)
+        loop(time, sleepMillis)
+      }
+    }
 
-            lastTime = time
-            Thread.sleep(sleepMillis)
-          }
-        })
+    With(errorCallback)(_ =>
+      With(Disposable.Create(Unit)(_ => glfwTerminate()))(_ => {
+        With(keyCallback)(_ =>
+          With(window)(_ => loop(glfwGetTime(), sleepMillis))
+        )
       })
-      glfwTerminate()
-    })
+    )
   }
 }
 
