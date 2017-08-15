@@ -58,6 +58,16 @@ object HttpDefs {
     @JsonKey("type") tpe: Int
   )
 
+  @ConfiguredJsonCodec case class NotifyPrefs(
+    errorsInterval: Int,
+  )
+
+  @ConfiguredJsonCodec case class SteamInfo(
+    displayName: String,
+    id: String,
+    ownership: List[Int],
+  )
+
   @ConfiguredJsonCodec case class MyInfo(
     @JsonKey("_id") id: String,
     email: String,
@@ -68,9 +78,9 @@ object HttpDefs {
     money: Double,
     credits: Option[Double],
     badge: Either[Int, CustomBadge],
-    //  notifyPrefs: NotifyPrefs,
+    notifyPrefs: NotifyPrefs,
     promoPeriodUntil: Option[Long],
-    // steam: SteamInfo,
+    steam: SteamInfo,
     subscription: Boolean,
     subscriptionTokens: Int,
   )
