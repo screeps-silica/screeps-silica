@@ -1,14 +1,16 @@
 package silica.networking.types
 
 import org.scalatest._
-import io.circe._, io.circe.parser._
+import io.circe._, io.circe.parser._, io.circe.syntax._
+import cats.syntax.functor._
 
 import HttpDefs._
 
 
 class HttpSpec extends FlatSpec with Matchers {
-    "MyInfo" should "parse example json" in {
-        val json_string = """{
+  "MyInfo" should "parse example json" in {
+    val json_string =
+      """{
             "_id": "57874d42d0ae911e3bd15bbc",
             "badge": {
                 "color1": "#260d0d",
@@ -46,8 +48,18 @@ class HttpSpec extends FlatSpec with Matchers {
             "username": "daboross"
         }"""
 
-        val parsed: Either[io.circe.Error, MyInfo] = decode(json_string)
-
-        parsed should matchPattern { case Right(_) => }
+    {
+      val parsed = decode[Accept[MyInfo]](json_string)
+      parsed should matchPattern { case Right(_) => }
     }
+
+    {
+      val parsed = decode[Accept[MyInfo]](json_string)
+      parsed should matchPattern { case Right(Okay(_)) => }
+
+      val asOkayInstance = decode[OkayInstance](parsed.right.get.okay.asJson.noSpaces)
+      asOkayInstance should matchPattern { case Right(OkayInstance(1)) => }
+    }
+
+  }
 }
