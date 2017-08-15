@@ -1,10 +1,13 @@
 package silica.networking.types
 
 import org.scalatest._
-import io.circe._, io.circe.parser._, io.circe.syntax._
+import io.circe._
+import io.circe.parser._
+import io.circe.syntax._
 import cats.syntax.functor._
-
 import HttpDefs._
+import silica.networking.types.util.Accept._
+import silica.networking.types.util.EncodeEither._
 
 
 class HttpSpec extends FlatSpec with Matchers {
