@@ -38,9 +38,9 @@ object HttpDefs {
     badge: Either[Int, CustomBadge],
     notifyPrefs: NotifyPrefs,
     promoPeriodUntil: Option[Long],
-    steam: SteamInfo,
-    subscription: Boolean,
-    subscriptionTokens: Int,
+    steam: Option[SteamInfo],
+    subscription: Option[Boolean],
+    subscriptionTokens: Option[Int],
   )
 
 }
