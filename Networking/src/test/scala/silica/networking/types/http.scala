@@ -1,15 +1,14 @@
 package silica.networking.types
 
-
 import org.scalatest._
-import argonaut._, Argonaut._
+import io.circe._, io.circe.parser._
 
 import HttpDefs._
 
 
 class HttpSpec extends FlatSpec with Matchers {
     "MyInfo" should "parse example json" in {
-        val json = """{
+        val json_string = """{
             "_id": "57874d42d0ae911e3bd15bbc",
             "badge": {
                 "color1": "#260d0d",
@@ -47,8 +46,8 @@ class HttpSpec extends FlatSpec with Matchers {
             "username": "daboross"
         }"""
 
-        val parsed: Either[Either[String,(String, argonaut.CursorHistory)], MyInfo] = json.decode[MyInfo]
+        val parsed: Either[io.circe.Error, MyInfo] = decode(json_string)
 
-        parsed should matchPattern { case MyInfo(1, _, _, _, _, _, _, _) => }
+        parsed should matchPattern { case Right(_) => }
     }
 }

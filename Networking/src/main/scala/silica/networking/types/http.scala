@@ -1,8 +1,6 @@
 package silica.networking.types
 
-
-import argonaut._, Argonaut._
-
+import io.circe._, io.circe.generic.semiauto._
 
 object HttpDefs {
     case class CustomBadge(
@@ -10,12 +8,13 @@ object HttpDefs {
         path2: String
     )
 
-    implicit def CustomBadgeJson: CodecJson[CustomBadge] =
-        casecodec2(CustomBadge.apply, CustomBadge.unapply)("path1", "path2")
+    implicit val customBadgeDecoder: Decoder[CustomBadge] = deriveDecoder
+
+    implicit val eitherDecode: Decoder[Either[Int, CustomBadge]] = deriveDecoder
 
     case class MyInfo(
         ok: Int,
-        id: String,
+        _id: String,
         username: String,
         password: Boolean,
         cpu: Int,
@@ -24,15 +23,6 @@ object HttpDefs {
         badge: Either[Int, CustomBadge]
     )
 
-    implicit def MyInfoJson: CodecJson[MyInfo] =
-        casecodec8(MyInfo.apply, MyInfo.unapply)(
-            "ok",
-            "_id",
-            "username",
-            "password",
-            "cpu",
-            "gcl",
-            "money",
-            "badge"
-        )
+    implicit val myInfoDecoder: Decoder[MyInfo] = deriveDecoder
+
 }

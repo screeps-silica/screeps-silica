@@ -1,6 +1,6 @@
 
 
-val argonautVersion = "6.2"
+val circeVersion = "0.8.0"
 val monocleVersion = "1.4.0"
 val lwjglVersion = "3.1.2"
 
@@ -15,11 +15,10 @@ lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
   libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.2",
 
   libraryDependencies ++= Seq(
-    "io.argonaut" %% "argonaut" % argonautVersion,
-    "io.argonaut" %% "argonaut-scalaz" % argonautVersion,
-    "io.argonaut" %% "argonaut-monocle" % argonautVersion,
-    "com.github.alexarchambault" %% "argonaut-shapeless_6.2" % "1.2.0-M6"
-  ),
+    "io.circe" %% "circe-core",
+    "io.circe" %% "circe-generic",
+    "io.circe" %% "circe-parser"
+  ).map(_ % circeVersion),
 
   libraryDependencies ++= Seq(
     "com.github.julien-truffaut" %% "monocle-core" % monocleVersion,
