@@ -82,6 +82,4 @@ class HttpSpec extends FlatSpec with Matchers {
       parsed should matchPattern { case Right(Okay(_)) => }
     }
   }
-
-  }
 }
