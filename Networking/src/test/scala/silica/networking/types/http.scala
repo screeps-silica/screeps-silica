@@ -63,6 +63,25 @@ class HttpSpec extends FlatSpec with Matchers {
       val asOkayInstance = decode[OkayInstance](parsed.right.get.okay.asJson.noSpaces)
       asOkayInstance should matchPattern { case Right(OkayInstance(1)) => }
     }
+  }
+
+  "LoginDetails" should "serialize into correct call" in {
+    val details = LoginDetails("daboross", "pass1234")
+
+    details.asJson.noSpaces shouldBe """{"email":"daboross","password":"pass1234"}"""
+  }
+
+  "LoggedIn" should "parse example json" in {
+    val json = """{
+      "ok": 1,
+      "token": "c07924d3f556a355eba7cd59f4c21f670fda76c2"
+    }"""
+
+    {
+      val parsed = decode[Accept[LoggedIn]](json)
+      parsed should matchPattern { case Right(Okay(_)) => }
+    }
+  }
 
   }
 }
