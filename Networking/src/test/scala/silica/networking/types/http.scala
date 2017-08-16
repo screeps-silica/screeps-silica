@@ -82,4 +82,145 @@ class HttpSpec extends FlatSpec with Matchers {
       parsed should matchPattern { case Right(Okay(_)) => }
     }
   }
+
+  "MapStatName.RoomOwner" should "serialize into correct string" in {
+    val stat: MapStatName = MapStatName.RoomOwner
+
+    stat.asJson.noSpaces shouldBe """"owner0""""
+  }
+
+  "MapStatName.Claim" should "serialize into correct string" in {
+    val stat: MapStatName = MapStatName.Claim
+
+    stat.asJson.noSpaces shouldBe """"claim0""""
+  }
+
+  "MapStatsDetails" should "serialize into correct string" in {
+    val details = MapStatsDetails(List("E4S61", "E5N70"), MapStatName.RoomOwner, "shard0")
+
+    details.asJson.noSpaces shouldBe """{"rooms":["E4S61","E5N70"],"stat":"owner0","shard":"shard0"}"""
+  }
+
+  "MapStats" should "parse example json" in {
+    val json = """{
+      "ok": 1,
+      "stats": {
+        "E14S78": {
+          "own": {
+            "level": 0,
+            "user": "57fbb4ada59532b2194a4c4e"
+          },
+          "sign": {
+            "time": 18325590,
+            "text": "[Ypsilon Pact] Quad claimed: unauthorised rooms may be removed.",
+            "user": "57fbb4ada59532b2194a4c4e",
+            "datetime": 1490752580310
+          },
+          "status": "normal",
+          "novice": 1485278202869
+        },
+        "E15N52": {
+          "own": {
+            "level": 8,
+            "user": "57874d42d0ae911e3bd15bbc"
+          },
+          "openTime": "1474674699273",
+          "status": "normal",
+          "novice": 1475538699273
+        },
+        "E19S81": {
+          "status": "normal",
+          "novice": 1491937635414
+        },
+        "E19S79": {
+          "own": {
+            "level": 3,
+            "user": "57e0dde6adafdf710cc02af0"
+          },
+          "sign": {
+            "time": 18318966,
+            "text": "Outer reach settlement",
+            "user": "57e0dde6adafdf710cc02af0",
+            "datetime": 1490723256463
+          },
+          "status": "normal",
+          "novice": 1485278202869,
+          "safeMode": true
+        },
+        "W6S67": {
+          "sign": {
+            "time": 16656131,
+            "text": "I have plans for this block",
+            "user": "57c7df771d90a0c561977377",
+            "datetime": 1484071532985
+          },
+          "status": "normal",
+          "novice": 1482080519526,
+          "hardSign": {
+            "time": 18297994,
+            "endDatetime": 1490978122587,
+            "text": "A new Novice Area is being planned somewhere in this sector. Please make sure all important rooms are reserved.",
+            "datetime": 1490632558393
+          }
+        }
+      },
+      "gameTime": 18325591,
+      "users": {
+        "57e0dde6adafdf710cc02af0": {
+          "username": "Pav234",
+          "_id": "57e0dde6adafdf710cc02af0",
+          "badge": {
+            "color1": "#25009c",
+            "flip": false,
+            "param": 100,
+            "color3": "#00c7ff",
+            "type": 16,
+            "color2": "#00c7ff"
+          }
+        },
+        "57fbb4ada59532b2194a4c4e": {
+          "username": "Parthon",
+          "_id": "57fbb4ada59532b2194a4c4e",
+          "badge": {
+            "color1": "#0066ff",
+            "flip": false,
+            "param": -6,
+            "color3": "#2b2b2b",
+            "type": 16,
+            "color2": "#00ddff"
+          }
+        },
+        "57c7df771d90a0c561977377": {
+          "username": "ChaosDMG",
+          "_id": "57c7df771d90a0c561977377",
+          "badge": {
+            "color1": "#f25c00",
+            "flip": false,
+            "param": 0,
+            "color3": "#f7efe2",
+            "type": 17,
+            "color2": "#f9a603"
+          }
+        },
+        "57874d42d0ae911e3bd15bbc": {
+          "username": "daboross",
+          "_id": "57874d42d0ae911e3bd15bbc",
+          "badge": {
+            "color1": "#260d0d",
+            "flip": false,
+            "param": -100,
+            "color3": "#ffe56d",
+            "type": 21,
+            "color2": "#6b2e41"
+          }
+        }
+      }
+    }"""
+
+    {
+      val parsed = decode[Accept[MapStats]](json)
+      parsed should matchPattern { case Right(Okay(_)) => }
+    }
+  }
+
 }
