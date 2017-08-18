@@ -67,11 +67,9 @@ object HttpDefs {
     final case object Claim extends MapStatName
   }
 
-  implicit val encodeMapStatName = new Encoder[MapStatName] {
-    final def apply(a: MapStatName): Json = a match {
-      case MapStatName.RoomOwner => Json.fromString("owner0")
-      case MapStatName.Claim => Json.fromString("claim0")
-    }
+  implicit val encodeMapStatName: Encoder[MapStatName] = {
+    case MapStatName.RoomOwner => Json.fromString("owner0")
+    case MapStatName.Claim => Json.fromString("claim0")
   }
 
   /** Output details for map-stats call */

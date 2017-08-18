@@ -1,7 +1,7 @@
 
 
 val circeVersion = "0.8.0"
-val lwjglVersion = "3.1.2"
+val lwjglVersion = "3.1.3-SNAPSHOT"
 val monocleVersion = "1.4.0"
 
 lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
@@ -77,6 +77,8 @@ lazy val root = (project in file("."))
         "-Yliteral-types",
         "-Xstrict-patmat-analysis",
         "-Xexperimental"
+      ),
+      javacOptions ++= Seq(
       ),
       addCompilerPlugin("org.scalamacros" % "paradise_2.12.3" % "2.1.1")
     )),
