@@ -3,8 +3,10 @@ package silica.networking.types
 import io.circe.Encoder, io.circe.Json
 import io.circe.generic.extras._
 import io.circe.syntax._
+import org.joda.time.DateTime
 
 object HttpDefs {
+  import silica.networking.types.util.EncodeDateTime._
   import silica.networking.types.util.EncodeEither._
 
   implicit val config: Configuration = Configuration.default.withDefaults
@@ -91,10 +93,8 @@ object HttpDefs {
     // (nonexistant, closed, open, novice{end_time} or second_tier_novice{room_open_time, end_time})
     status: String,
     @JsonKey("own") owner: Option[MapStatsRoomOwner],
-    // TODO: parse these into a scala time type - the json can
-    // be either a string contains a number, or a number itself - both represent unix time
-    novice: Option[Either[Long, String]],
-    openTime: Option[Either[Long, String]],
+    novice: Option[DateTime],
+    openTime: Option[DateTime],
     sign: Option[RoomSign],
     hardSign: Option[HardSign],
   )
@@ -115,7 +115,7 @@ object HttpDefs {
   /** Input sub-structure of various calls */
   @ConfiguredJsonCodec case class RoomSign(
     @JsonKey("time") gameTimeSet: Int,
-    @JsonKey("datetime") timeSet: Long, // TODO: scala unix time type
+    @JsonKey("datetime") timeSet: DateTime,
     @JsonKey("user") userId: String,
     text: String,
   )
@@ -123,8 +123,8 @@ object HttpDefs {
   /** Input sub-structure of various calls */
   @ConfiguredJsonCodec case class HardSign(
     @JsonKey("time") gameTimeSet: Int,
-    @JsonKey("datetime") start: Long, // TODO: scala unix time type
-    @JsonKey("endDatetime") end: Long, // TODO: scala unix time type
+    @JsonKey("datetime") start: DateTime,
+    @JsonKey("endDatetime") end: DateTime,
     text: String,
   )
 }

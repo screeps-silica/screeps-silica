@@ -34,12 +34,15 @@ lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
     "io.circe" %% "circe-core",
     "io.circe" %% "circe-generic",
     "io.circe" %% "circe-generic-extras",
-    "io.circe" %% "circe-parser"
+    "io.circe" %% "circe-parser",
+    "io.circe" %% "circe-java8"
   ).map(_ % circeVersion),
 
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
 
-  libraryDependencies += "org.scalamacros" % "paradise_2.12.3" % "2.1.1"
+  libraryDependencies += "org.scalamacros" % "paradise_2.12.3" % "2.1.1",
+
+  libraryDependencies += "joda-time" % "joda-time" % "2.9.9"
 )
 
 lazy val lwjglSettings: Seq[Def.Setting[_]] = Seq(

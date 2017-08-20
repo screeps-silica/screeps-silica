@@ -6,7 +6,9 @@ import io.circe.parser._
 import io.circe.syntax._
 import cats.syntax.functor._
 import HttpDefs._
+import org.joda.time.DateTime
 import silica.networking.types.util.Accept._
+import silica.networking.types.util.EncodeDateTime._
 import silica.networking.types.util.EncodeEither._
 
 
@@ -223,4 +225,9 @@ class HttpSpec extends FlatSpec with Matchers {
     }
   }
 
+
+  it must "encode times reversibly" in {
+    val startTime = DateTime.now()
+    assert(startTime.getMillis === decode[DateTime](startTime.asJson.noSpaces).right.get.getMillis)
+  }
 }
