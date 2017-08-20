@@ -12,10 +12,13 @@ import silica.networking.types.util.EncodeDateTime._
 import silica.networking.types.util.EncodeEither._
 
 
-class HttpSpec extends FlatSpec with Matchers {
-  "MyInfo" should "parse example json" in {
-    val json_string =
-      """{
+class HttpSpec extends FunSpec with Matchers {
+
+  describe("API types") {
+    describe("MyInfo") {
+      it("should parse example json") {
+        val json_string =
+          """{
             "_id": "57874d42d0ae911e3bd15bbc",
             "badge": {
                 "color1": "#260d0d",
@@ -53,58 +56,69 @@ class HttpSpec extends FlatSpec with Matchers {
             "username": "daboross"
         }"""
 
-    {
-      val parsed = decode[Accept[MyInfo]](json_string)
-      parsed should matchPattern { case Right(_) => }
+        {
+          val parsed = decode[Accept[MyInfo]](json_string)
+          parsed should matchPattern { case Right(_) => }
+        }
+
+        {
+          val parsed = decode[Accept[MyInfo]](json_string)
+          parsed should matchPattern { case Right(Okay(_)) => }
+
+          val asOkayInstance = decode[OkayInstance](parsed.right.get.okay.asJson.noSpaces)
+          asOkayInstance should matchPattern { case Right(OkayInstance(1)) => }
+        }
+      }
     }
 
-    {
-      val parsed = decode[Accept[MyInfo]](json_string)
-      parsed should matchPattern { case Right(Okay(_)) => }
-
-      val asOkayInstance = decode[OkayInstance](parsed.right.get.okay.asJson.noSpaces)
-      asOkayInstance should matchPattern { case Right(OkayInstance(1)) => }
+    describe("LoginDetails") {
+      it("should serialize into correct call") {
+        val details = LoginDetails("daboross", "pass1234")
+        details.asJson.noSpaces shouldBe """{"email":"daboross","password":"pass1234"}"""
+      }
     }
-  }
 
-  "LoginDetails" should "serialize into correct call" in {
-    val details = LoginDetails("daboross", "pass1234")
+    describe("LoggedIn") {
+      it("should parse example json") {
+        val json =
+          """{
+         "ok": 1,
+          "token": "c07924d3f556a355eba7cd59f4c21f670fda76c2"
+        }"""
 
-    details.asJson.noSpaces shouldBe """{"email":"daboross","password":"pass1234"}"""
-  }
-
-  "LoggedIn" should "parse example json" in {
-    val json = """{
-      "ok": 1,
-      "token": "c07924d3f556a355eba7cd59f4c21f670fda76c2"
-    }"""
-
-    {
-      val parsed = decode[Accept[LoggedIn]](json)
-      parsed should matchPattern { case Right(Okay(_)) => }
+        {
+          val parsed = decode[Accept[LoggedIn]](json)
+          parsed should matchPattern { case Right(Okay(_)) => }
+        }
+      }
     }
-  }
 
-  "MapStatName.RoomOwner" should "serialize into correct string" in {
-    val stat: MapStatName = MapStatName.RoomOwner
+    describe("MapStatName.RoomOwner") {
+      it("should serialize into correct string") {
+        val stat: MapStatName = MapStatName.RoomOwner
+        stat.asJson.noSpaces shouldBe """"owner0""""
+      }
+    }
 
-    stat.asJson.noSpaces shouldBe """"owner0""""
-  }
+    describe("MapStatName.Claim") {
+      it("should serialize into correct string") {
+        val stat: MapStatName = MapStatName.Claim
+        stat.asJson.noSpaces shouldBe """"claim0""""
+      }
+    }
 
-  "MapStatName.Claim" should "serialize into correct string" in {
-    val stat: MapStatName = MapStatName.Claim
+    describe("MapStatsDetails") {
+      it("should serialize into correct string") {
+        val details = MapStatsDetails(List("E4S61", "E5N70"), MapStatName.RoomOwner, "shard0")
 
-    stat.asJson.noSpaces shouldBe """"claim0""""
-  }
+        details.asJson.noSpaces shouldBe """{"rooms":["E4S61","E5N70"],"stat":"owner0","shard":"shard0"}"""
+      }
+    }
 
-  "MapStatsDetails" should "serialize into correct string" in {
-    val details = MapStatsDetails(List("E4S61", "E5N70"), MapStatName.RoomOwner, "shard0")
-
-    details.asJson.noSpaces shouldBe """{"rooms":["E4S61","E5N70"],"stat":"owner0","shard":"shard0"}"""
-  }
-
-  "MapStats" should "parse example json" in {
-    val json = """{
+    describe("MapStats") {
+      it("should parse example json") {
+        val json =
+          """{
       "ok": 1,
       "stats": {
         "E14S78": {
@@ -219,15 +233,26 @@ class HttpSpec extends FlatSpec with Matchers {
       }
     }"""
 
-    {
-      val parsed = decode[Accept[MapStats]](json)
-      parsed should matchPattern { case Right(Okay(_)) => }
+        {
+          val parsed = decode[Accept[MapStats]](json)
+          parsed should matchPattern { case Right(Okay(_)) => }
+        }
+      }
     }
   }
 
+  describe("Time Encoding") {
+    it("must encode reversibly") {
+      val startTime = DateTime.now()
+      assert(startTime.getMillis === decode[DateTime](startTime.asJson.noSpaces).right.get.getMillis)
+    }
 
-  it must "encode times reversibly" in {
-    val startTime = DateTime.now()
-    assert(startTime.getMillis === decode[DateTime](startTime.asJson.noSpaces).right.get.getMillis)
+    it("must map linearly as a function of time") {
+      def roundTrip(dateTime: DateTime): DateTime = decode[DateTime](dateTime.asJson.noSpaces).right.get
+      val now = DateTime.now()
+
+      roundTrip(now).plusSeconds(1) shouldEqual roundTrip(now.plusSeconds(1))
+      roundTrip(now).minusDays(1) shouldEqual roundTrip(now.minusDays(1))
+    }
   }
 }
