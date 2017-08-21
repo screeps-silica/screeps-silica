@@ -102,7 +102,7 @@ object HttpDefs {
   /** Input sub-structure of map-stats */
   @ConfiguredJsonCodec case class MapStatsUserResponse(
     badge: Either[Int, CustomBadge],
-    @JsonKey("_id") user_id: String,
+    @JsonKey("_id") userId: String,
     username: String,
   )
 
