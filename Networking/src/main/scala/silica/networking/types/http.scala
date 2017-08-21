@@ -127,4 +127,66 @@ object HttpDefs {
     @JsonKey("endDatetime") end: DateTime,
     text: String,
   )
+
+  /** Input sub-structure of room-overview */
+  @ConfiguredJsonCodec case class RoomOverviewRoomOwner(
+    username: String,
+    badge: CustomBadge,
+  )
+
+  /** Input sub-structure of room-overview */
+  @ConfiguredJsonCodec case class RoomOverviewStatPoint(
+    value: Int,
+    endTime: Int,
+  )
+
+  /**
+   * Input sub-structure of room-overview.
+   *
+   * Each item in each list is a stat point, separated by the requested time interval.
+   */
+  @ConfiguredJsonCodec case class RoomOverviewSelectedStats(
+    energyHarvested: List[RoomOverviewStatPoint],
+    energyConstruction: List[RoomOverviewStatPoint],
+    energyCreeps: List[RoomOverviewStatPoint],
+    energyControl: List[RoomOverviewStatPoint],
+    creepsProduced: List[RoomOverviewStatPoint],
+    creepsLost: List[RoomOverviewStatPoint],
+  )
+
+  /**
+   * Input sub-structure of room-overview.
+   *
+   * Each '*8', '*180' and '*1440' property is the total of a stat for the past hour, the past day,
+   * and the past week respectively.
+   */
+  @ConfiguredJsonCodec case class RoomOverviewTotalStats(
+    // TODO: find some way to do post-processing to turn this whole class into
+    // a List<RoomOverviewStatPage> where RoomOverviewStatPage just has 'energy', 'energyConstruction',
+    // etc. properties.
+    energy8: Int,
+    energy180: Int,
+    energy1440: Int,
+    energyConstruction8: Int,
+    energyConstruction180: Int,
+    energyConstruction1440: Int,
+    energyControl8: Int,
+    energyControl180: Int,
+    energyControl1440: Int,
+    energyCreeps8: Int,
+    energyCreeps180: Int,
+    energyCreeps1440: Int,
+    creepsProduced8: Int,
+    creepsProduced180: Int,
+    creepsProduced1440: Int,
+    creepsLost8: Int,
+    creepsLost180: Int,
+    creepsLost1440: Int,
+  )
+
+  @ConfiguredJsonCodec case class RoomOverview(
+    owner: Option[RoomOverviewRoomOwner],
+    stats: RoomOverviewSelectedStats,
+    @JsonKey("statsMax") totals: RoomOverviewTotalStats,
+  )
 }
