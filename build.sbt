@@ -1,7 +1,7 @@
 
 
 val circeVersion = "0.8.0"
-val lwjglVersion = "3.1.3-SNAPSHOT"
+val lwjglVersion = "3.1.2"
 val monocleVersion = "1.4.0"
 
 lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
