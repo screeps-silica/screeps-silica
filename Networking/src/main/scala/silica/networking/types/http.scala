@@ -1,5 +1,7 @@
 package silica.networking.types
 
+import io.circe._
+import io.circe.parser._
 import io.circe.Encoder, io.circe.Json
 import io.circe.generic.extras._
 import io.circe.syntax._
