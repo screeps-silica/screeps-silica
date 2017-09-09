@@ -1,8 +1,8 @@
 
 
-val argonautVersion = "6.2"
-val monocleVersion = "1.4.0"
+val circeVersion = "0.8.0"
 val lwjglVersion = "3.1.2"
+val monocleVersion = "1.4.0"
 
 lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
 
@@ -13,13 +13,6 @@ lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
   ),
 
   libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.2",
-
-  libraryDependencies ++= Seq(
-    "io.argonaut" %% "argonaut" % argonautVersion,
-    "io.argonaut" %% "argonaut-scalaz" % argonautVersion,
-    "io.argonaut" %% "argonaut-monocle" % argonautVersion,
-    "com.github.alexarchambault" %% "argonaut-shapeless_6.2" % "1.2.0-M6"
-  ),
 
   libraryDependencies ++= Seq(
     "com.github.julien-truffaut" %% "monocle-core" % monocleVersion,
@@ -37,7 +30,19 @@ lazy val sharedSettings: Seq[Def.Setting[_]] = Seq(
   libraryDependencies += "org.scala-graph" %% "graph-constrained" % "1.11.0",
   libraryDependencies += "io.reactivex" %% "rxscala" % "0.26.5",
 
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
+  libraryDependencies ++= Seq(
+    "io.circe" %% "circe-core",
+    "io.circe" %% "circe-generic",
+    "io.circe" %% "circe-generic-extras",
+    "io.circe" %% "circe-parser",
+    "io.circe" %% "circe-java8"
+  ).map(_ % circeVersion),
+
+  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
+
+  libraryDependencies += "org.scalamacros" % "paradise_2.12.3" % "2.1.1",
+
+  libraryDependencies += "joda-time" % "joda-time" % "2.9.9"
 )
 
 lazy val lwjglSettings: Seq[Def.Setting[_]] = Seq(
@@ -75,7 +80,10 @@ lazy val root = (project in file("."))
         "-Yliteral-types",
         "-Xstrict-patmat-analysis",
         "-Xexperimental"
-      )
+      ),
+      javacOptions ++= Seq(
+      ),
+      addCompilerPlugin("org.scalamacros" % "paradise_2.12.3" % "2.1.1")
     )),
     name := "Silica"
   )
